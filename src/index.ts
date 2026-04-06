@@ -1,38 +1,30 @@
 import express from 'express';
-import { Pool } from 'pg';
 import dotenv from 'dotenv';
+import { db } from './database/index.js';
+import { users } from './database/schema.js';
+import { runMigrations } from './database/migrate.js';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 4000;
 
-// Database Connection
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-});
+await runMigrations();
+
+app.use(express.json());
+
 
 app.get('/', async (req, res) => {
     try {
-        const dbRes = await pool.query('SELECT NOW()');
-        res.json({
-            status: "Heartbeat Alive",
-            database_time: dbRes.rows[0].now
-        });
+        const allUsers = await db.select().from(users); 
+        res.json({allUsers});
     } catch (err) {
-        res.status(500).json({ status: "Heartbeat Failing", error: err });
+        res.status(500).json({ error: "Failed to fetch users" });
     }
 });
 
 app.listen(port, () => {
     console.log(`🚀 Server glowing at http://localhost:${port}`);
-});
-
-app.listen(port, () => {
     console.log(`Is this the Krusty Krab?`);
-});
-
-app.listen(port, () => {
     console.log(`No, this is Patrick.`);
 });
-    

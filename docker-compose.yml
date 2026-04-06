@@ -5,8 +5,10 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: task_manager
+    ports:
+      - "5432:5432" # Reference for Postgres for Seeding in VSC ON YOUR MAC (NOT ON DOCKER) 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d task_manager"]
+      test: [ "CMD-SHELL", "pg_isready -U user -d task_manager" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -14,7 +16,7 @@ services:
   app:
     build: .
     ports:
-      - "4000:4000"
+      - "4000:4000" # Reference for Postgres for Seeding in VSC ON DOCKER (NOT ON YOUR MAC) 
     environment:
       DATABASE_URL: postgresql://user:password@db:5432/task_manager
     depends_on:
